@@ -5,7 +5,7 @@ const cors = require('cors')
 
 const configuration = new Configuration({
     organization: "org-tqGGXvERE6z05szfHgOF2WOg",
-    apiKey: "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",
+    apiKey: ,
 });
 
 const openai = new OpenAIApi(configuration);
@@ -34,7 +34,7 @@ app.post('/', async (req, res) => {
         method: "POST",
         headers: {
             'Content-Type': "application/json",
-            'Authorization': `Bearer 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`
+            'Authorization': `Bearer `
         }
     }
 
