@@ -2,9 +2,24 @@ import './App.css';
 import './normal.css';
 import { useState } from 'react';
 
+// import { useState, useEffect } from 'react';
+// <div className="models_new">
+// <select onChange={(e)=> {setCurrentModel(e.target.value)}}>
+//   {models.map((model, index) => (
+//     <option key={model.id} value={model.id}>{model.id}</option>
+//   ))}
+// </select>
+// </div>
+
 function App() {
 
+// useEffect(() => {
+//   getEngines();
+// }, [])
+
+//  const [models, setModels] = useState([]);
   const [input, setInput] = useState("");
+//  const [currentModel, setCurrentModel] = useState("text-davinci-003");
   const [chatLog, setChatLog] = useState([{
     user: "gpt",
     message: "How can I help you today?"
@@ -13,30 +28,44 @@ function App() {
     message: "I want to use ChatGPT today"
   }]);
 
+  // clear chats
+  function clearChat() {
+    setChatLog([]);
+  }
+
+// function getEngines(){
+//   fetch("http://localhost:3080/models")
+//   .then(res => res.json())
+//   .then(data => {
+//     console.log(data.models.data)
+//     setModels(data.models.data)
+//   })
+// }
+
   async function handleSubmit(e){
     e.preventDefault();
-    setChatLog([...chatLog, { user: "me", message: `${input}`}])
+    let chatLogNew = [...chatLog, { user: "me", message: `${input}`}]
+    
     setInput("");
+    setChatLog(chatLogNew);
 
+    const messages = chatLogNew.map((message) => message.message).join("\n")
     const response = await fetch("http://localhost:3080/", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
       },
-      body: JSON.stringify({
-          message: chatLog.map((message) => 
-          message.message).join("")
-        })
+      body: JSON.stringify({message: messages})
       });
-    const data = await response.json();
-    setChatLog([...chatLog, {user: "gpt", message: `${data.message}`}])
-    console.log(data.message);
-  }
 
+    const data = await response.json();
+    setChatLog([...chatLogNew, {user: "gpt", message: `${data.message}`}])
+  }
+ //onChange={(e)=> {setCurrentModel(e.target.value)}}
   return (
     <div className="App">
     <aside className="sidemenu">
-      <div className='side-menu-button'>
+      <div className='side-menu-button' onClick={clearChat}>
         <span>+</span>
         New Chat
       </div>
@@ -47,19 +76,13 @@ function App() {
         <ChatMessage key={index} message={message} />
       ))}
     </div>
-
-
-    
-
-    
       <div className="chat-input-holder">
-      <form onSubmit={handleSubmit}>
+     <form onSubmit={handleSubmit}>
         <input rows="1"  value={input} onChange={(e)=> setInput(e.target.value)} className='chat-input-textarea'>
         </input>
       </form>
       </div>
     </section>
-    
     </div>
   );
 }

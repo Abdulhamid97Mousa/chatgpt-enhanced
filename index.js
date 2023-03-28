@@ -1,53 +1,49 @@
-const { Configuration, OpenAIApi } = require("openai");
+const { Configuration, OpenAIApi } = require("openai")
 const express = require('express')
-const bodyParser = require("body-parser")
+const bodyParser = require('body-parser')
 const cors = require('cors')
 
 const configuration = new Configuration({
     organization: "org-tqGGXvERE6z05szfHgOF2WOg",
-    apiKey: ,
+    apiKey: "",
 });
 
 const openai = new OpenAIApi(configuration);
 
-
-
-const app = express()
+const app = express();
 app.use(bodyParser.json())
 app.use(cors())
-const port = 3080;
+const port = 3080
 
-app.listen(port, () =>
-  console.log(`listening on port ${port}`)
-);
 
 app.post('/', async (req, res) => {
-    const { message } = req.body;
-    console.log(message)
-    const body = {
-                "model": "text-davinci-003",
-                "prompt": `${message}`,
-                "max_tokens": 1024,
-                "temperature": 0.5
-            }
-    const options = {
-        method: "POST",
-        headers: {
-            'Content-Type': "application/json",
-            'Authorization': `Bearer `
-        }
-    }
+  const { message} = req.body;
+  console.log(message, "message")
 
-    const response = await openai.createCompletion({body, options});
+  const response = await openai.createCompletion({
+  model: "text-davinci-003",
+  prompt: `${message}`,
+  max_tokens: 1024,
+  temperature: 0.0,
+  },{
+  proxy:{
+    host: "127.0.0.1",
+    port: 7890
+  }});
+  res.json({
+    message: response.data.choices[0].text,
+  })
 
-
-    res.json({
-        // data: response.data
-        message: response.data.choices[0].text,
-    })
 });
 
+// app.get('/models', async (req, res) => {
+//   const response = await openai.listEngines();
+//   console.log(response.data.data)
+//   res.json({
+//     models: response.data.data
+//   })
+// });
 
-
-
-// create a simple express api that calls the function above
+app.listen(port, () => {
+  console.log(`Example app listening at http://localhost:${port}`)
+});
